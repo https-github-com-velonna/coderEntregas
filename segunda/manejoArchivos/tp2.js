@@ -6,11 +6,12 @@ const ARCHIVO = 'productos.txt';
 const PRODUCTO= {id:0,title: '', price: 0, thumbnail: ''};
 
 class Contenedor{
-    constructor(producto){
-        this.producto=producto;        
+    constructor(productos){
+        this.listProducto=productos;        
     }
     //guardar un producto
     save(producto){
+        console.log(producto);
         if(Existe){
             writeNewProduct(producto);
             return producto.id;
@@ -28,7 +29,7 @@ class Contenedor{
     //traer todos los productos 
     getAll(){   
         if(Existe){
-            this.getAll();
+            readProduct();
 
         }
     }
@@ -46,13 +47,7 @@ class Contenedor{
         });
 
     }
-
-    //actualizar un producto
-    updateById(id, producto){
-        if(Existe){
  
-        }
-    }   
   
 }
 
@@ -75,11 +70,15 @@ function Existe(){
 
 //incrementar id de producto
 function IncrementarId(){
-  
+        if(Existe){
+
         let productos = readProduct();
-        let id = productos[productos.length-1].id;
+        let id = productos.length>0? productos[productos.length-1].id:0;
         return id+1;    
-   
+        }else{
+            return 0;
+        }
+
 }
 async function writeNewProduct(producto){
     try{  
@@ -106,23 +105,15 @@ async function writeNewProduct(producto){
 async function readProduct(){
     try{
         const data = await fs.promises.readFile(path.join(__dirname, ARCHIVO));
+        console.log("readProducto");
+        console.log(data);
         return JSON.parse(data);
     }catch(error){
         console.log('No se pudo leer el archivo',error);
 
     }
 }
- async function modifyProduct(id, producto){
-    try{
-        const productos = await readProduct();
-        const productoIndex = productos.findIndex(producto => producto.id === id);
-        productos[productoIndex] = producto;
-        await fs.promises.writeFile(path.join(__dirname, ARCHIVO), JSON.stringify(productos));
-        console.log('Se ha modificado el producto');
-    }catch(error){
-        console.log('No se pudo modificar el producto',error);
-    }
-}   
+   
 async function deleteProduct(id){
     try{
         const productos = await readProduct();
@@ -139,6 +130,9 @@ async function searchProduct(id){
     try{
         const productos = await readProduct();
         const productoIndex = productos.findIndex(producto => producto.id === id);
+        console.log("buscando producto");
+        console.log(productoIndex);
+        console.log(productos[productoIndex]);
         return productos[productoIndex];
     }catch(error){
         console.log('No se pudo buscar el producto',error);
@@ -150,24 +144,21 @@ async function searchProduct(id){
 function CrearProducto(titles, prices, thumbnails){
    let productoNuevo = PRODUCTO;
     productoNuevo.id=IncrementarId();
-    productoNuevo.title=producto.titles; 
-    productoNuevo.price=producto.prices;
-    productoNuevo.thumbnail=producto.thumbnails;
+    productoNuevo.title=titles; 
+    productoNuevo.price=prices;
+    productoNuevo.thumbnail=thumbnails;
     return productoNuevo;
 
 }
-let unProducto1 = new Contenedor(CrearProducto('manzanas01', '10', './img/manzanas.jpg'));
-let unProducto2 = new Contenedor(CrearProducto('manzanas02', '50', './img/manzanas.jpg'));
-let unProducto3 = new Contenedor(CrearProducto('manzanas03', '20', './img/manzanas.jpg'));
- console.log (unProducto1.save(unProducto1));
-    console.log (unProducto2.save(unProducto2));
+let unProducto1 = CrearProducto('manzanas01', '10', './img/manzanas.jpg');
+let unProducto2 = CrearProducto('manzanas02', '50', './img/manzanas.jpg');
+let unProducto3 = CrearProducto('manzanas03', '20', './img/manzanas.jpg');
+let listProd=  [unProducto1,unProducto2,unProducto3];
+console.log(listProd);
+let contenedor = new Contenedor(listProd);
+    console.log (contenedor.save(listProd[0]));
+    console.log (contenedor.getById(1));
+    console.log (contenedor.getAll());
 
-    console.log (unProducto3.save(unProducto3));
-    console.log (unProducto1.getById(1));
-    console.log (unProducto2.getById(2));
-    console.log (unProducto3.getById(3));
-    console.log (unProducto1.getAll());
-    console.log (unProducto2.getAll());
-    console.log (unProducto3.getAll());
-    console.log (unProducto1.deleteById(1));
+  //  console.log (contenedor.deleteById(1));
     
