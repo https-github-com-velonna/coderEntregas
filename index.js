@@ -31,8 +31,17 @@ let string = "hola";
 let fs = require("fs"); //file system
 let archivo = fs.readFileSync("index.js", "utf-8");
 let leerArchivo = () => console.log(archivo);
-let escribirArchivo = () => fs.writeFileSync("C:/Users/v_nin/Desktop/mensajes.txt", "hola mundo");
-const data = require("./data.json");
+let escribirArchivo = fs.writeFileSync("C:/Users/v_nin/Desktop/mensajes.txt", "hola munditoljljlhhho");
+let agregarArchivo = fs.appendFileSync("C:/Users/v_nin/Desktop/mensajes.txt", " hola mundppdsitoljljlhhhoAgregotx")
+const saveLog = (texto) => {
+    const lineOfData = `${texto}\n`;
+    fs.appendFile('C:/Users/v_nin/Desktop/mensajes.txt', lineOfData, {encoding: 'utf8', flag: 'a'}, (error) =>{
+      if (error) throw error;
+      console.log('Nueva linea añadida correctamente');
+    });
+  }
+
+//const data = require("./data.json");
 
 /**
  * 
@@ -42,3 +51,6 @@ const data = require("./data.json");
 
 // si el collback recibe un error y su conteido
  // do something else asynchronously and callback(null, result)
+
+ console.log(saveLog('Nueva correctamente'));
+ 

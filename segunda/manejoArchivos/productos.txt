@@ -1,1 +1,0 @@
-{"id":1,"title":"manzanas03","price":"20","thumbnail":"./img/manzanas.jpg"}

@@ -87,11 +87,12 @@ async function writeNewProduct(producto){
         }else{
             if(await readProduct().length == 0){
              await fs.promises.writeFile(path.join(__dirname, ARCHIVO), JSON.stringify(producto));
-        console.log('Se ha creado el producto');  }
-        else{
-            await fs.promises.appendFile(path.join(__dirname, ARCHIVO), JSON.stringify(producto));
-            console.log('Se ha creado el producto');
-        }
+            console.log('Se ha creado el producto'); 
+             }
+            else{
+                await fs.promises.appendFile(path.join(__dirname, ARCHIVO), JSON.stringify(producto));
+                console.log('Se ha creado el producto');
+            }
      }
 
      
@@ -102,11 +103,14 @@ async function writeNewProduct(producto){
 
   
 }
-async function readProduct(){
+function readProduct(){
     try{
-        const data = await fs.promises.readFile(path.join(__dirname, ARCHIVO));
-        console.log("readProducto");
-        console.log(data);
+        const data = fs.readFileSync(path.join(__dirname, ARCHIVO));
+     //    console.log("readProducto");
+      //   console.log(JSON.parse(data));
+         if(data)
+             return PRODUCTO;
+         else
         return JSON.parse(data);
     }catch(error){
         console.log('No se pudo leer el archivo',error);
@@ -126,11 +130,15 @@ async function deleteProduct(id){
     }
 }   
 //existe producto
-async function searchProduct(id){
+ function searchProduct(id){
     try{
-        const productos = await readProduct();
-        const productoIndex = productos.findIndex(producto => producto.id === id);
+        const productos = readProduct();
+
         console.log("buscando producto");
+        
+        console.log(productos);
+        const productoIndex = productos.find(e => e.id ===id)
+    
         console.log(productoIndex);
         console.log(productos[productoIndex]);
         return productos[productoIndex];
@@ -157,8 +165,8 @@ let listProd=  [unProducto1,unProducto2,unProducto3];
 console.log(listProd);
 let contenedor = new Contenedor(listProd);
     console.log (contenedor.save(listProd[0]));
-    console.log (contenedor.getById(1));
-    console.log (contenedor.getAll());
+  //  console.log (contenedor.getById(1));
+   // console.log (contenedor.getAll());
 
   //  console.log (contenedor.deleteById(1));
     
