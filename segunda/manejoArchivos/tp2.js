@@ -1,9 +1,10 @@
 //Manejo de archivos
 const fs = require('fs');
 const path = require('path');
+const { hasUncaughtExceptionCaptureCallback } = require('process');
 const ARCHIVO = 'productos.txt';
 
-const PRODUCTO= {id:0,title: '', price: 0, thumbnail: ''};
+//const PRODUCTO= {id:0,title: '', price: 0, thumbnail: ''};
 
 class Contenedor{
     constructor(productos){
@@ -11,33 +12,30 @@ class Contenedor{
     }
     //guardar un producto
     save(producto){
-        console.log(producto);
-        if(Existe){
-            writeNewProduct(producto);
-            return producto.id;
-
-        }
-      
+       
+          //  writeFiles(producto);
+        appendFiles(producto);
     }
     //buscar el producto por id
     getById(id){
-        if(Existe){
-            searchProduct(id);
-
-        }
+      fs.readFile(ARCHIVO, (err, data) => {
+            if (err) throw err;
+            console.log(data);
+            let prods = JSON.parse(data);
+            console.log(prods);
+            let productos = JSON.stringify(prods).split(',');
+           console.log(productos);
+            let producto = productos.find(prod => prod.id == id);
+         
+        });
     }  
     //traer todos los productos 
     getAll(){   
-        if(Existe){
-            readProduct();
-
-        }
+        readFiles();
     }
     //eliminar un producto
     deleteById(id){
-        if(Existe){
-            deleteProduct(id);
-        }
+       
     }
     //elimiar todo los productos
     deleteAll(){
@@ -51,122 +49,52 @@ class Contenedor{
   
 }
 
-//existe el archivo
-function Existe(){
+async function writeFiles(producto){
     try{
-        if(fs.existsSync(path.join(__dirname, ARCHIVO))){
-           
-        }else{
-            fs.mkdirSync(path.join(__dirname, ARCHIVO));
-        }
-        return true;
+        await fs.promises.writeFile(ARCHIVO, JSON.stringify(producto));
+        console.log(`Archivo guardado ${producto.id}`);
+    }catch(error){
+        console.log(error);
+    }   
+}
 
+async function appendFiles(producto){
+    try{
+        await fs.promises.appendFile(ARCHIVO, JSON.stringify(producto));
+        console.log(`Archivo guardado ${producto.id}`);
+    }catch(error){
+        console.log(error);
+    }   
+}
+async function readFiles(){
+    try{
+        console.log("Leyendo");
+        await fs.promises.readFile(ARCHIVO, (err, data) => {
+            if (err) throw err;
+          //  console.log(data);
+            let prods = JSON.parse(data);
+            console.log(prods);
+          
+        });
     }catch(error){
         console.log(error);
     }
-    
-
 }
 
-//incrementar id de producto
-function IncrementarId(){
-        if(Existe){
+let producto1 = {};
+producto1.id = 1;
+producto1.title = 'Laptop';
+producto1.price = 20000;
+producto1.thumbnail = 'laptop.jpg';
 
-        let productos = readProduct();
-        let id = productos.length>0? productos[productos.length-1].id:0;
-        return id+1;    
-        }else{
-            return 0;
-        }
+let producto2 = {};
+producto2.id = 2;
+producto2.title = 'Television';
+producto2.price = 30000;
+producto2.thumbnail = 'tv.jpg';
 
-}
-async function writeNewProduct(producto){
-    try{  
-        if(await searchProduct(producto.id)){
-            console.log('El producto ya existe');
-        }else{
-            if(await readProduct().length == 0){
-             await fs.promises.writeFile(path.join(__dirname, ARCHIVO), JSON.stringify(producto));
-            console.log('Se ha creado el producto'); 
-             }
-            else{
-                await fs.promises.appendFile(path.join(__dirname, ARCHIVO), JSON.stringify(producto));
-                console.log('Se ha creado el producto');
-            }
-     }
-
-     
-
-    }catch(error){
-        console.log(error);
-    }
-
-  
-}
-function readProduct(){
-    try{
-        const data = fs.readFileSync(path.join(__dirname, ARCHIVO));
-     //    console.log("readProducto");
-      //   console.log(JSON.parse(data));
-         if(data)
-             return PRODUCTO;
-         else
-        return JSON.parse(data);
-    }catch(error){
-        console.log('No se pudo leer el archivo',error);
-
-    }
-}
-   
-async function deleteProduct(id){
-    try{
-        const productos = await readProduct();
-        const productoIndex = productos.findIndex(producto => producto.id === id);
-        productos.splice(productoIndex, 1);
-        await fs.promises.writeFile(path.join(__dirname, ARCHIVO), JSON.stringify(productos));
-        console.log('Se ha eliminado el producto');
-    }catch(error){
-        console.log('No se pudo eliminar el producto',error);
-    }
-}   
-//existe producto
- function searchProduct(id){
-    try{
-        const productos = readProduct();
-
-        console.log("buscando producto");
-        
-        console.log(productos);
-        const productoIndex = productos.find(e => e.id ===id)
-    
-        console.log(productoIndex);
-        console.log(productos[productoIndex]);
-        return productos[productoIndex];
-    }catch(error){
-        console.log('No se pudo buscar el producto',error);
-    }
-}
-
-
-
-function CrearProducto(titles, prices, thumbnails){
-   let productoNuevo = PRODUCTO;
-    productoNuevo.id=IncrementarId();
-    productoNuevo.title=titles; 
-    productoNuevo.price=prices;
-    productoNuevo.thumbnail=thumbnails;
-    return productoNuevo;
-
-}
-let unProducto1 = CrearProducto('manzanas01', '10', './img/manzanas.jpg');
-let unProducto2 = CrearProducto('manzanas02', '50', './img/manzanas.jpg');
-let unProducto3 = CrearProducto('manzanas03', '20', './img/manzanas.jpg');
-let listProd=  [unProducto1,unProducto2,unProducto3];
-console.log(listProd);
-let contenedor = new Contenedor(listProd);
-    console.log (contenedor.save(listProd[0]));
-  //  console.log (contenedor.getById(1));
-   // console.log (contenedor.getAll());
-
-  //  console.log (contenedor.deleteById(1));
-    
+let contenedor = new Contenedor([producto1, producto2]);
+//contenedor.save(producto1);
+//contenedor.save(producto2);
+//contenedor.getById(2);
+contenedor.getAll();
